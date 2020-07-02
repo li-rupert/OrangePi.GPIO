@@ -27,7 +27,7 @@ SOFTWARE.
 #define ZERO            1
 #define R1              1
 #define ZEROPLUS        2 // H5 => same as 1 but different ALT function
-#define ZEROPLUS2H5     2 // H5 => same as 1 but different ALT function
+#define ZEROPLUS2H5     3
 #define ZEROPLUS2H3     3
 #define PCPCPLUS        4
 #define ONE             4
