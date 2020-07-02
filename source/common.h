@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#define USE_SYSFS	1
+
 #define BOARD_UNKNOWN  -1
 #define ZERO            1
 #define R1              1
@@ -32,6 +34,9 @@ SOFTWARE.
 #define PLUS2E          4
 #define PC2             5
 #define PRIME           6
+#define THREE           7
+#define TYPE_FIRST      ZERO
+#define TYPE_LAST       THREE
 
 #define MODE_UNKNOWN   -1
 #define BOARD          10

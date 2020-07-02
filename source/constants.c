@@ -91,6 +91,9 @@ void define_constants(PyObject *module)
 	bprime = Py_BuildValue("i", PRIME);
 	PyModule_AddObject(module, "PRIME", bprime);
 
+	bthree = Py_BuildValue("i", THREE);
+	PyModule_AddObject(module, "THREE", bthree);
+
 	version = Py_BuildValue("s", "0.6.3");
 	PyModule_AddObject(module, "VERSION", version);
 
@@ -100,5 +103,6 @@ void define_constants(PyObject *module)
 	PyModule_AddObject(module, "PE", Py_BuildValue("i", 128));
 	PyModule_AddObject(module, "PF", Py_BuildValue("i", 160));
 	PyModule_AddObject(module, "PG", Py_BuildValue("i", 192));
+	PyModule_AddObject(module, "PH", Py_BuildValue("i", 224));
 	PyModule_AddObject(module, "PL", Py_BuildValue("i", 352));
 }

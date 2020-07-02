@@ -28,6 +28,10 @@ SOFTWARE.
 #include "common.h"
 #include "constants.h"
 
+#if USE_SYSFS
+#include "event_gpio.h"
+#endif
+
 static int gpio_warnings = 1;
 
 struct py_callback
@@ -75,7 +79,7 @@ static PyObject *py_setopi(PyObject *self, PyObject *args)
     return NULL;
   }
 
-  if (board_type < ZERO || board_type > PRIME )
+  if (board_type < TYPE_FIRST || board_type > TYPE_LAST )
   {
     PyErr_SetString(PyExc_ValueError, "An invalid board was passed to setboard()");
     return NULL;
@@ -89,6 +93,7 @@ static PyObject *py_setopi(PyObject *self, PyObject *args)
     case 4 : pin_to_gpio = &pin_to_gpio_pc; break;
     case 5 : pin_to_gpio = &pin_to_gpio_pc2; break;
     case 6 : pin_to_gpio = &pin_to_gpio_prime; break;
+    case 7 : pin_to_gpio = &pin_to_gpio_three; break;
   }
 
   Py_RETURN_NONE;
@@ -199,6 +204,14 @@ static PyObject *py_setup_channel(PyObject *self, PyObject *args, PyObject *kwar
     return NULL;
   }
 
+#if USE_SYSFS
+  gpio_export(gpio);
+  gpio_set_direction(gpio, direction == INPUT);
+  if (direction == OUTPUT && (initial == LOW || initial == HIGH))
+  {
+    gpio_set_value(gpio, initial == HIGH);
+  }
+#else
   if (direction == OUTPUT)
     pud = PUD_OFF + PY_PUD_CONST_OFFSET;
 
@@ -230,6 +243,7 @@ static PyObject *py_setup_channel(PyObject *self, PyObject *args, PyObject *kwar
     output_gpio(gpio, initial);
   }
   setup_gpio(gpio, direction, pud);
+#endif
   gpio_direction[gpio] = direction;
 
   Py_RETURN_NONE;
@@ -256,7 +270,11 @@ static PyObject *py_output_gpio(PyObject *self, PyObject *args)
    if (check_gpio_priv())
       return NULL;
 
+#if USE_SYSFS
+   gpio_set_value(gpio, value != 0);
+#else
    output_gpio(gpio, value);
+#endif
    Py_RETURN_NONE;
 }
 
@@ -283,7 +301,12 @@ static PyObject *py_input_gpio(PyObject *self, PyObject *args)
    if (check_gpio_priv())
       return NULL;
 
-   if (input_gpio(gpio)) {
+#if USE_SYSFS
+   int val = gpio_get_value(gpio);
+#else
+   int val = input_gpio(gpio);
+#endif
+   if (val) {
       value = Py_BuildValue("i", HIGH);
    } else {
       value = Py_BuildValue("i", LOW);
@@ -674,6 +697,7 @@ PyMethodDef opi_gpio_methods[] = {
   {"cleanup", (PyCFunction)py_cleanup, METH_VARARGS | METH_KEYWORDS, "Clean up by resetting all GPIO channels that have been used by this program to INPUT with no pullup/pulldown and no event detection\n[channel] - individual channel to clean up.  Default - clean every channel that has been used."},
   {"output", py_output_gpio, METH_VARARGS, "Output to a GPIO channel\nchannel - either board pin number or BCM number depending on which mode is set.\nvalue   - 0/1 or False/True or LOW/HIGH"},
   {"input", py_input_gpio, METH_VARARGS, "Input from a GPIO channel.  Returns HIGH=1=True or LOW=0=False\nchannel - either board pin number or BCM number depending on which mode is set."},
+#if USE_SYSFS == 0
   {"gpio_function", py_gpio_function, METH_VARARGS, "Return the current GPIO function (IN, OUT, Multiplexing function ID)\nchannel - either board pin number or GPIO number depending on which mode is set."},
   {"gpio_function_name", py_gpio_function_string, METH_VARARGS, "Return the current GPIO function (IN, OUT, Multiplexing function) as string\nchannel - either board pin number or GPIO number depending on which mode is set."},
   {"add_event_detect", (PyCFunction)py_add_event_detect, METH_VARARGS | METH_KEYWORDS, "Enable edge detection events for a particular GPIO channel.\nchannel      - either board pin number or BCM number depending on which mode is set.\nedge         - RISING, FALLING or BOTH\n[callback]   - A callback function for the event (optional)\n[bouncetime] - Switch bounce timeout in ms for callback"},
@@ -681,6 +705,7 @@ PyMethodDef opi_gpio_methods[] = {
   {"event_detected", py_event_detected, METH_VARARGS, "Returns True if an edge has occured on a given GPIO.  You need to enable edge detection using add_event_detect() first.\nchannel - either board pin number or BCM number depending on which mode is set."},
   {"add_event_callback", (PyCFunction)py_add_event_callback, METH_VARARGS | METH_KEYWORDS, "Add a callback for an event already defined using add_event_detect()\nchannel      - either board pin number or BCM number depending on which mode is set.\ncallback     - a callback function"},
   {"wait_for_edge", py_wait_for_edge, METH_VARARGS, "Wait for an edge.\nchannel - either board pin number or BCM number depending on which mode is set.\nedge    - RISING, FALLING or BOTH"},
+#endif
   {NULL, NULL, 0, NULL}
 };
 

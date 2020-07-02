@@ -44,6 +44,7 @@ int is_valid_raw_port(int channel)
 	if (channel >= 128 && channel < 147) return 5; // PE
 	if (channel >= 160 && channel < 167) return 6; // PF
 	if (channel >= 192 && channel < 207) return 7; // PG
+	if (channel >= 224 && channel < 234) return 8; // PH
 	if (channel >= 352 && channel < 365) return 12; // PL
 	return 0;
 }
@@ -113,11 +114,13 @@ int check_gpio_priv(void)
 		PyErr_SetString(PyExc_RuntimeError, "Module not imported correctly!");
 		return 1;
 	}
+#if USE_SYSFS == 0
 	// check mmap setup has worked
 	if (!module_setup)
 	{
 		PyErr_SetString(PyExc_RuntimeError, "No access to /dev/mem.  Try running as root!");
 		return 2;
 	}
+#endif
 	return 0;
 }
