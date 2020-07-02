@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#define USE_SYSFS	1
+#define USE_SYSFS       1
+#define FOR_H6_ONLY     0 //when USE_SYSFS == 0
 
 #define BOARD_UNKNOWN  -1
 #define ZERO            1

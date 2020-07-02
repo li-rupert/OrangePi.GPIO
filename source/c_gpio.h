@@ -20,14 +20,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#define GPIO_BASE_OPI     (0x01C20000)
-#define SUNXI_GPIO_BASE   (0x01C20800)
-#define SUNXI_PWM_BASE    (0x01C21400)
+#include "common.h"
 
-#define PAGE_SIZE         (4*1024)
-#define BLOCK_SIZE        (4*1024)
-#define MAP_SIZE          (4096*2)
-#define MAP_MASK          (MAP_SIZE - 1)
+#if FOR_H6_ONLY
+#define SUNXI_GPIO_BASE   (0x0300B000)
+#define SUNXI_GPIO_BASE_2 (0x07022000)
+#define SUNXI_PWM_BASE    (0x0300A000)
+#define SUNXI_PWM_BASE_2  (0x07020C00)
+#else
+#define SUNXI_GPIO_BASE   (0x01C20800)
+#define SUNXI_GPIO_BASE_2 (0x01F02C00)
+#define SUNXI_PWM_BASE    (0x01C21400)
+#define SUNXI_PWM_BASE_2  (0x01F03800)
+#endif
+
+#define SUNXI_GPIO_EXTRA  352
+
+#define BLOCK_SIZE        0x400
+#define MAP_MASK          (BLOCK_SIZE - 1)
 
 #define SETUP_OK          0
 #define SETUP_DEVMEM_FAIL 1

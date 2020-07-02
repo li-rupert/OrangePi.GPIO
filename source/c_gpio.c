@@ -51,23 +51,16 @@ void writel(uint32_t val, uint32_t addr)
 int setup(void)
 {
 	int mem_fd;
-	uint8_t *gpio_mem;
 
 	if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
 	{
 		return SETUP_DEVMEM_FAIL;
 	}
 
-	if ((gpio_mem = malloc(BLOCK_SIZE + (PAGE_SIZE-1))) == NULL)
-		return SETUP_MALLOC_FAIL;
-
-	if ((uint32_t)gpio_mem % PAGE_SIZE)
-		gpio_mem += PAGE_SIZE - ((uint32_t)gpio_mem % PAGE_SIZE);
-
-	gpio_map = (uint32_t *)mmap( (caddr_t)gpio_mem, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, mem_fd, GPIO_BASE_OPI);
+	gpio_map = (uint32_t *)mmap(NULL, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, mem_fd, SUNXI_GPIO_BASE);
 
 	if(OPiGPIODebug)
-		printf("gpio_mem = 0x%x\t gpio_map = 0x%x\n",gpio_mem,gpio_map);
+		printf("gpio_map = 0x%x\n",gpio_map);
 
 	if ((uint32_t)gpio_map < 0)
 		return SETUP_MMAP_FAIL;
