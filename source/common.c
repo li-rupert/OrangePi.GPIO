@@ -28,7 +28,11 @@ SOFTWARE.
 int board_type = BOARD_UNKNOWN;
 int gpio_mode = MODE_UNKNOWN;
 int setup_error = 0;
+#if USE_SYSFS
+int module_setup = 1;
+#else
 int module_setup = 0;
+#endif
 
 /* Physical pin to BCM channel */
 const int phys_To_BCM[41] = {

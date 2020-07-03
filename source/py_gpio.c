@@ -403,7 +403,9 @@ static PyObject *py_cleanup(PyObject *self, PyObject *args, PyObject *kwargs)
       for (i=0; i<383; i++) {
         if (gpio_direction[i] != -1) {
           //printf("Clean %d\n",i);
+#if USE_SYSFS == 0
           setup_gpio(i, INPUT, PUD_OFF); //take care
+#endif
           gpio_direction[i] = -1;
           found = 1;
           //printf("Clean Fnished %d \n",i);
@@ -414,7 +416,9 @@ static PyObject *py_cleanup(PyObject *self, PyObject *args, PyObject *kwargs)
       event_cleanup(gpio);
       // set everything back to input
       if (gpio_direction[gpio] != -1) {
+#if USE_SYSFS == 0
         setup_gpio(gpio, INPUT, PUD_OFF);
+#endif
         gpio_direction[gpio] = -1;
         found = 1;
       }
